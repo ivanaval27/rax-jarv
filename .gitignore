@@ -1,0 +1,11 @@
+# RAX JARV .gitignore
+bin/
+lib/
+lib64
+__pycache__/
+*.pyc
+*.pyo
+server.log
+.lock
+CACHEDIR.TAG
+pyvenv.cfg
