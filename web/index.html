@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RAX JARVIS 🎙️</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' wss://100.80.16.121:4433 wss://* ws://*; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+<title>RAX JARV 🎙️</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: system-ui, -apple-system, sans-serif;
-    background: #0a0a0f;
+    background: #000000;
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -21,7 +25,7 @@
   }
   h1 {
     font-size: 2.5rem;
-    background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+    background: linear-gradient(135deg, #E30613, #FF6B00);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -63,7 +67,7 @@
     max-width: 90vw;
     min-height: 60px;
     display: none;
-    border-left: 3px solid #7b2ff7;
+    border-left: 3px solid #E30613;
     word-wrap: break-word;
   }
   .response-box.show { display: block; }
@@ -78,15 +82,15 @@
     font-size: 1rem;
   }
   .btn-secondary.active-mode {
-    border-color: #00d4ff;
-    color: #00d4ff;
+    border-color: #E30613;
+    color: #E30613;
   }
   
   /* ─── PIN Login ───────────────────────────────────── */
   .pin-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #0a0a0f;
+    background: #000000;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -116,9 +120,9 @@
     transition: all 0.3s;
   }
   .pin-dot.filled {
-    background: #00d4ff;
-    border-color: #00d4ff;
-    box-shadow: 0 0 15px #00d4ff66;
+    background: #FF6B00;
+    border-color: #FF6B00;
+    box-shadow: 0 0 15px #FF6B0066;
   }
   .pin-pad {
     display: grid;
@@ -146,16 +150,9 @@
     background: #2a2a4e;
     transform: scale(0.92);
   }
-  .pin-key.delete {
-    font-size: 1.2rem;
-    color: #ff4444;
-  }
+  .pin-key.delete { font-size: 1.2rem; color: #ff4444; }
   .pin-key.empty { visibility: hidden; }
-  .pin-error {
-    color: #ff4444;
-    font-size: 1rem;
-    min-height: 1.5rem;
-  }
+  .pin-error { color: #ff4444; font-size: 1rem; min-height: 1.5rem; }
   .main-content {
     width: 100%;
     display: flex;
@@ -198,24 +195,17 @@
     gap: 3px;
   }
   .log-body.collapsed { display: none; }
-  .log-line {
-    color: #0f0;
-    word-break: break-all;
-    line-height: 1.4;
-  }
+  .log-line { color: #0f0; word-break: break-all; line-height: 1.4; }
   .log-line.dim { color: #666; }
-  .log-line.info { color: #0af; }
+  .log-line.info { color: #FF6B00; }
   .log-line.warn { color: #fa0; }
   .log-line.done { color: #0f0; }
   .log-line.response { color: #fff; }
   .log-line.error { color: #f44; }
-  
-  /* Scrollbar del log */
   .log-body::-webkit-scrollbar { width: 4px; }
   .log-body::-webkit-scrollbar-track { background: #0d0d1a; }
   .log-body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
   
-  /* Responsive: más compacto en celulares */
   @media (max-width: 400px) {
     .pin-pad { gap: 8px; grid-template-columns: repeat(3, 70px); }
     .pin-key { width: 70px; height: 70px; font-size: 1.5rem; }
@@ -231,10 +221,10 @@
   }
 </style>
 </head>
-<body>
+<body onload="initApp()">
 
 <!-- PIN Login -->
-<div class="pin-overlay" id="pinOverlay">
+<div class="pin-overlay" id="pinOverlay" style="display:flex">
   <div class="pin-title">🔒 RAX</div>
   <div class="pin-subtitle">Ingresa el PIN de acceso</div>
   <div class="pin-dots" id="pinDots">
@@ -244,7 +234,7 @@
     <div class="pin-dot" id="dot3"></div>
   </div>
   <div class="pin-error" id="pinError"></div>
-  <div class="pin-pad">
+  <div class="pin-pad" id="pinPad">
     <button class="pin-key" data-key="1">1</button>
     <button class="pin-key" data-key="2">2</button>
     <button class="pin-key" data-key="3">3</button>
@@ -262,159 +252,43 @@
 
 <!-- Main Content -->
 <div class="main-content hidden" id="mainContent">
-  <h1>🎙️ RAX</h1>
+  <h1>🎙️ RAX JARV</h1>
   <p style="color:#888">Presiona el botón para hablar</p>
   
   <div class="controls">
-    <button class="btn-secondary active-mode" id="modePTT">📞 PTT</button>
-    <button class="btn-secondary" id="modeAuto">🎤 Auto</button>
-    <button class="btn-secondary" id="logoutBtn" style="border-color:#ff4444;color:#ff4444">🔒 Salir</button>
+    <button class="btn-secondary active-mode" id="modePTT" onclick="setModePTT()">📞 PTT</button>
+    <button class="btn-secondary" id="modeAuto" onclick="setModeAuto()">🎤 Auto</button>
+    <button class="btn-secondary" id="logoutBtn" style="border-color:#ff4444;color:#ff4444" onclick="doLogout()">🔒 Salir</button>
   </div>
   
-  <button class="mic-btn" id="micBtn">🎤</button>
-  <div class="status" id="status">Conectando...</div>
+  <button class="mic-btn" id="micBtn" ontouchstart="startMic(event)" ontouchend="stopMic(event)" onmousedown="startMic(event)" onmouseup="stopMic(event)">🎤</button>
+  <div class="status" id="status">Iniciando...</div>
   <div class="response-box" id="responseBox"></div>
   
   <!-- Terminal de logs -->
   <div class="log-container" id="logContainer">
-    <div class="log-header" id="logHeader">
+    <div class="log-header" id="logHeader" onclick="toggleLog()">
       <span>🖥️ Terminal</span>
       <span class="log-toggle" id="logToggle">▼</span>
     </div>
     <div class="log-body" id="logBody">
-      <div class="log-line">[SISTEMA] Conectando...</div>
+      <div class="log-line">[SISTEMA] Iniciando...</div>
     </div>
   </div>
 </div>
 
 <script>
+// ─── Config ──────────────────────────────────────────────────────────
+const WS_URL = 'wss://100.80.16.121:4433/ws';
+const WS_FALLBACK = 'wss://192.168.2.24:4433/ws';
+const PIN = '2727';
+
+// ─── Globales ────────────────────────────────────────────────────────
 let pinValue = '';
-const MAX_PIN = 4;
-const PIN_ERROR = document.getElementById('pinError');
-
-// ─── PIN Logic ────────────────────────────────────────────────────
-function updatePinDots() {
-  for (let i = 0; i < MAX_PIN; i++) {
-    const dot = document.getElementById('dot' + i);
-    dot.className = 'pin-dot' + (i < pinValue.length ? ' filled' : '');
-  }
-}
-
-function pinKey(key) {
-  PIN_ERROR.textContent = '';
-  if (key === 'delete') {
-    pinValue = pinValue.slice(0, -1);
-    updatePinDots();
-    return;
-  }
-  if (pinValue.length >= MAX_PIN) return;
-  pinValue += key;
-  updatePinDots();
-  
-  if (pinValue.length === MAX_PIN) {
-    checkPin();
-  }
-}
-
-async function checkPin() {
-  try {
-    const res = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin: pinValue })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      localStorage.setItem('rax_auth', 'true');
-      document.getElementById('pinOverlay').classList.add('hidden');
-      document.getElementById('mainContent').classList.remove('hidden');
-      setTimeout(() => statusEl.textContent = '✅ PTT — Presiona el botón para hablar', 500);
-    } else {
-      PIN_ERROR.textContent = '❌ PIN incorrecto';
-      pinValue = '';
-      updatePinDots();
-    }
-  } catch (e) {
-    PIN_ERROR.textContent = '❌ Error de conexión';
-    pinValue = '';
-    updatePinDots();
-  }
-}
-
-// Botones del PIN
-document.querySelectorAll('.pin-key[data-key]').forEach(btn => {
-  btn.addEventListener('click', () => pinKey(btn.dataset.key));
-  btn.addEventListener('touchstart', (e) => { e.preventDefault(); pinKey(btn.dataset.key); });
-});
-document.getElementById('pinDelete').addEventListener('click', () => pinKey('delete'));
-document.getElementById('pinDelete').addEventListener('touchstart', (e) => { e.preventDefault(); pinKey('delete'); });
-
-// ─── Verificar auth al cargar ─────────────────────────────────────
-if (localStorage.getItem('rax_auth') === 'true') {
-  document.getElementById('pinOverlay').classList.add('hidden');
-  document.getElementById('mainContent').classList.remove('hidden');
-}
-
-// ─── WebSocket ─────────────────────────────────────────────────────
-const WS_URL = `wss://${location.hostname}:4433/ws`;
 let ws = null;
 let isConnected = false;
 let isAutoMode = false;
 let autoRecording = false;
-
-const micBtn = document.getElementById('micBtn');
-const statusEl = document.getElementById('status');
-const responseBox = document.getElementById('responseBox');
-const modePTT = document.getElementById('modePTT');
-const modeAuto = document.getElementById('modeAuto');
-
-function connectWS() {
-  ws = new WebSocket(WS_URL);
-  ws.binaryType = 'arraybuffer';
-  ws.onopen = () => {
-    isConnected = true;
-    statusEl.textContent = '✅ Conectado';
-    statusEl.className = 'status connected';
-  };
-  ws.onclose = () => {
-    isConnected = false;
-    statusEl.textContent = '❌ Desconectado, reconectando...';
-    statusEl.className = 'status';
-    setTimeout(connectWS, 2000);
-  };
-  ws.onmessage = (e) => {
-    if (e.data instanceof ArrayBuffer) {
-      const blob = new Blob([e.data], { type: 'audio/mpeg' });
-      const audio = new Audio(URL.createObjectURL(blob));
-      audio.play().catch(() => {});
-    } else {
-      const msg = e.data;
-      if (msg.startsWith('[LOG] ')) {
-        // Mensaje de log para la terminal
-        const logText = msg.replace('[LOG] ', '');
-        const logClass = logText.includes('❌') ? 'error' : 
-                        logText.includes('✅') ? 'done' :
-                        logText.includes('🤖') || logText.includes('💬') ? 'info' : 'dim';
-        addLogLine(logText, logClass);
-      } else if (msg.startsWith('🤖 ')) {
-        // Respuesta de RAX
-        responseBox.textContent = msg;
-        responseBox.className = 'response-box show';
-        addLogLine('🤖 ' + msg.replace('🤖 ', ''), 'response');
-      } else if (msg.startsWith('📝 ')) {
-        // Transcripción
-        responseBox.textContent = msg;
-        responseBox.className = 'response-box show';
-      } else {
-        responseBox.textContent = msg;
-        responseBox.className = 'response-box show';
-      }
-    }
-  };
-}
-connectWS();
-
-// ─── PCM Recording ─────────────────────────────────────────────────
 let pcmActive = false;
 let pcmChunks = [];
 let pcmStream = null;
@@ -422,216 +296,379 @@ let pcmCtx = null;
 let pcmSource = null;
 let pcmProcessor = null;
 let pcmSampleRate = 16000;
+let logCollapsed = false;
 
-async function startPCMCapture() {
-  if (pcmActive) return;
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true }
-    });
-    pcmCtx = new AudioContext();
-    pcmSampleRate = pcmCtx.sampleRate;
-    pcmChunks = [];
-    pcmSource = pcmCtx.createMediaStreamSource(stream);
-    const bufferSize = 4096;
-    pcmProcessor = pcmCtx.createScriptProcessor(bufferSize, 1, 1);
-    pcmProcessor.onaudioprocess = (e) => {
-      if (!pcmActive) return;
-      const input = e.inputBuffer.getChannelData(0);
-      const int16 = new Int16Array(input.length);
-      for (let i = 0; i < input.length; i++) {
-        const s = Math.max(-1, Math.min(1, input[i]));
-        int16[i] = s < 0 ? s * 32768 : s * 32767;
-      }
-      pcmChunks.push(int16);
-    };
-    pcmSource.connect(pcmProcessor);
-    pcmProcessor.connect(pcmCtx.destination);
-    pcmActive = true;
-    pcmStream = stream;
-    micBtn.className = 'mic-btn active';
-    statusEl.textContent = '🎤 Grabando...';
-    statusEl.className = 'status recording';
-  } catch (e) {
-    statusEl.textContent = '❌ Error: ' + e.message;
-    statusEl.className = 'status';
-    cleanupPCM();
-  }
-}
+function byId(id) { return document.getElementById(id); }
 
-function stopPCMCapture() {
-  if (!pcmActive) return;
-  pcmActive = false;
-  if (pcmProcessor) try { pcmProcessor.disconnect(); } catch(e) {}
-  if (pcmSource) try { pcmSource.disconnect(); } catch(e) {}
-  if (pcmCtx) try { pcmCtx.close(); } catch(e) {}
-  if (pcmStream) pcmStream.getTracks().forEach(t => t.stop());
-  pcmProcessor = null; pcmSource = null; pcmCtx = null; pcmStream = null;
-  micBtn.className = 'mic-btn';
+// ─── Init ────────────────────────────────────────────────────────────
+function initApp() {
+  addLog('Sistema iniciado', 'info');
   
-  if (pcmChunks.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
-    const totalSamples = pcmChunks.reduce((acc, c) => acc + c.length, 0);
-    const pcmBlob = new Int16Array(totalSamples);
-    let offset = 0;
-    for (const chunk of pcmChunks) { pcmBlob.set(chunk, offset); offset += chunk.length; }
-    statusEl.textContent = '🧠 Procesando...';
-    statusEl.className = 'status processing';
-    const header = new TextEncoder().encode('PCM');
-    const srBytes = new Uint8Array(2);
-    srBytes[0] = pcmSampleRate & 0xFF;
-    srBytes[1] = (pcmSampleRate >> 8) & 0xFF;
-    const dataView = new Uint8Array(pcmBlob.buffer);
-    const combined = new Uint8Array(header.length + srBytes.length + dataView.length);
-    combined.set(header, 0);
-    combined.set(srBytes, header.length);
-    combined.set(dataView, header.length + srBytes.length);
-    ws.send(combined.buffer);
+  // PIN buttons via onclick on parent
+  byId('pinPad').addEventListener('click', function(e) {
+    var btn = e.target;
+    if (btn.classList.contains('pin-key') && btn.dataset.key) {
+      pinKey(btn.dataset.key);
+    }
+  });
+  byId('pinPad').addEventListener('touchstart', function(e) {
+    // prevent scroll while tapping PIN
+  }, {passive: true});
+  
+  byId('pinDelete').addEventListener('click', function() { pinKey('delete'); });
+  
+  // Check saved auth (safe from file://)
+  try {
+    if (localStorage.getItem('rax_auth') === 'true') {
+      showMain();
+    }
+  } catch(e) {
+    addLog('localStorage no disponible', 'dim');
   }
-  pcmChunks = [];
-  if (!isAutoMode) { statusEl.textContent = '✅ Listo'; statusEl.className = 'status connected'; }
+  
+  // Connect WebSocket
+  connectWS();
 }
 
-function cleanupPCM() {
+// ─── UI Helpers ──────────────────────────────────────────────────────
+function showMain() {
+  byId('pinOverlay').style.display = 'none';
+  byId('mainContent').classList.remove('hidden');
+  byId('status').textContent = '✅ Conectando...';
+  byId('status').className = 'status';
+}
+
+function setStatus(text, cls) {
+  var el = byId('status');
+  el.textContent = text;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+// ─── PIN ─────────────────────────────────────────────────────────────
+function updateDots() {
+  for (var i = 0; i < 4; i++) {
+    var d = byId('dot' + i);
+    d.className = 'pin-dot' + (i < pinValue.length ? ' filled' : '');
+  }
+}
+
+function pinKey(key) {
+  byId('pinError').textContent = '';
+  if (key === 'delete') { pinValue = pinValue.slice(0, -1); updateDots(); return; }
+  if (pinValue.length >= 4) return;
+  pinValue += key;
+  updateDots();
+  if (pinValue.length === 4) checkPin();
+}
+
+function checkPin() {
+  if (pinValue === PIN) {
+    localStorage.setItem('rax_auth', 'true');
+    showMain();
+  } else {
+    byId('pinError').textContent = '❌ PIN incorrecto';
+    pinValue = '';
+    updateDots();
+  }
+}
+
+// ─── WebSocket ───────────────────────────────────────────────────────
+var wsRetries = 0;
+var wsMaxRetries = 100;  // nunca dejar de intentar
+
+function connectWS() {
+  // Alternar entre URL primaria y fallback si se han hecho muchos intentos
+  var url = wsRetries < 5 ? WS_URL : WS_FALLBACK;
+  if (wsRetries === 5) addLog('Cambiando a IP local como fallback...', 'warn');
+  try {
+    ws = new WebSocket(url);
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = function() {
+      isConnected = true;
+      wsRetries = 0;
+      setStatus('✅ Conectado', 'connected');
+      addLog('WebSocket conectado', 'done');
+      // Si estaba en modo auto, reanudar micrófono automáticamente
+      if (isAutoMode) {
+        setTimeout(function() { doStartPCM(); }, 500);
+      }
+    };
+    ws.onerror = function(err) {
+      addLog('WS Error: ' + (err.message || err.type || 'desconocido'), 'error');
+    };
+    ws.onclose = function() {
+      isConnected = false;
+      setStatus('❌ Desconectado, reconectando...', '');
+      wsRetries++;
+      // Backoff exponencial: 1s, 2s, 4s, 8s... máximo 15s
+      var delay = Math.min(1000 * Math.pow(2, Math.min(wsRetries, 5)), 15000);
+      addLog('Reconectando en ' + (delay/1000) + 's... (intento ' + wsRetries + ')', 'dim');
+      setTimeout(connectWS, delay);
+    };
+    ws.onmessage = function(e) {
+      if (e.data instanceof ArrayBuffer) {
+        var blob = new Blob([e.data], {type: 'audio/mpeg'});
+        var audio = new Audio(URL.createObjectURL(blob));
+        audio.play().catch(function(){});
+      } else {
+        var msg = e.data;
+        if (msg.startsWith('[LOG] ')) {
+          var t = msg.replace('[LOG] ', '');
+          var c = t.includes('❌') ? 'error' : t.includes('✅') ? 'done' : t.includes('💬') ? 'info' : 'dim';
+          addLog(t, c);
+        } else if (msg.startsWith('🤖 ')) {
+          byId('responseBox').textContent = msg;
+          byId('responseBox').className = 'response-box show';
+          addLog(msg.replace('🤖 ', ''), 'response');
+        } else if (msg.startsWith('📝 ')) {
+          byId('responseBox').textContent = msg;
+          byId('responseBox').className = 'response-box show';
+        } else {
+          byId('responseBox').textContent = msg;
+          byId('responseBox').className = 'response-box show';
+        }
+      }
+    };
+  } catch(e) {
+    addLog('WS Error: ' + e.message, 'error');
+    wsRetries++;
+    setTimeout(connectWS, 3000);
+  }
+}
+
+// ─── Mic ─────────────────────────────────────────────────────────────
+function startMic(event) {
+  if (event) event.preventDefault();
+  if (isAutoMode) return;
+  if (pcmActive) return;
+  doStartPCM();
+}
+
+function stopMic(event) {
+  if (event) event.preventDefault();
+  if (isAutoMode) return;
+  if (pcmActive) doStopPCM();
+}
+
+function doStartPCM() {
+  addLog('Solicitando micrófono...', 'info');
+  try {
+    navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}})
+    .then(function(stream) {
+      pcmActive = true;
+      pcmChunks = [];
+      pcmStream = stream;
+      
+      try { pcmCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {
+        addLog('Error AudioContext: ' + e.message, 'error');
+        return;
+      }
+      pcmSampleRate = pcmCtx.sampleRate;
+      pcmSource = pcmCtx.createMediaStreamSource(stream);
+      
+      try {
+        pcmProcessor = pcmCtx.createScriptProcessor(4096, 1, 1);
+      } catch(e) {
+        // Fallback para algunos WebViews
+        pcmProcessor = pcmCtx.createScriptProcessor(2048, 1, 1);
+      }
+      
+      pcmProcessor.onaudioprocess = function(e) {
+        if (!pcmActive) return;
+        var input = e.inputBuffer.getChannelData(0);
+        var buf = new Int16Array(input.length);
+        for (var i = 0; i < input.length; i++) {
+          var s = Math.max(-1, Math.min(1, input[i]));
+          buf[i] = s < 0 ? s * 32768 : s * 32767;
+        }
+        pcmChunks.push(buf);
+      };
+      
+      pcmSource.connect(pcmProcessor);
+      pcmProcessor.connect(pcmCtx.destination);
+      
+      byId('micBtn').className = 'mic-btn active';
+      setStatus('🎤 Grabando...', 'recording');
+      addLog('🎤 Grabando...', 'warn');
+    })
+    .catch(function(err) {
+      setStatus('❌ Micrófono: ' + err.message, '');
+      addLog('❌ Error mic: ' + err.message, 'error');
+      addLog('💡 Ve a Ajustes > RAX JARVIS > Permisos > Activar micrófono', 'info');
+    });
+  } catch(e) {
+    setStatus('❌ Error: ' + e.message, '');
+    addLog('❌ ' + e.message, 'error');
+  }
+}
+
+function doStopPCM() {
   pcmActive = false;
+  
   try { if (pcmProcessor) pcmProcessor.disconnect(); } catch(e) {}
   try { if (pcmSource) pcmSource.disconnect(); } catch(e) {}
   try { if (pcmCtx) pcmCtx.close(); } catch(e) {}
-  if (pcmStream) pcmStream.getTracks().forEach(t => t.stop());
+  if (pcmStream) pcmStream.getTracks().forEach(function(t) { t.stop(); });
+  
   pcmProcessor = null; pcmSource = null; pcmCtx = null; pcmStream = null;
+  byId('micBtn').className = 'mic-btn';
+  
+  if (pcmChunks.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
+    var total = 0;
+    for (var i = 0; i < pcmChunks.length; i++) total += pcmChunks[i].length;
+    
+    var pcmBlob = new Int16Array(total);
+    var offset = 0;
+    for (var j = 0; j < pcmChunks.length; j++) {
+      pcmBlob.set(pcmChunks[j], offset);
+      offset += pcmChunks[j].length;
+    }
+    
+    setStatus('🧠 Procesando...', 'processing');
+    addLog('Enviando audio (' + (total/pcmSampleRate).toFixed(1) + 's)...', 'info');
+    
+    var header = new TextEncoder().encode('PCM');
+    var srBytes = new Uint8Array(2);
+    srBytes[0] = pcmSampleRate & 0xFF;
+    srBytes[1] = (pcmSampleRate >> 8) & 0xFF;
+    var dataView = new Uint8Array(pcmBlob.buffer);
+    var combined = new Uint8Array(header.length + srBytes.length + dataView.length);
+    combined.set(header, 0);
+    combined.set(srBytes, header.length);
+    combined.set(dataView, header.length + srBytes.length);
+    
+    ws.send(combined.buffer);
+  }
+  
   pcmChunks = [];
+  if (!isAutoMode) { setStatus('✅ Listo', 'connected'); }
 }
 
-// ─── PTT Mode ──────────────────────────────────────────────────────
-micBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (!isAutoMode) startPCMCapture(); });
-micBtn.addEventListener('touchend', (e) => { e.preventDefault(); if (!isAutoMode) stopPCMCapture(); });
-micBtn.addEventListener('mousedown', () => { if (!isAutoMode) startPCMCapture(); });
-micBtn.addEventListener('mouseup', () => { if (!isAutoMode) stopPCMCapture(); });
+// ─── Modes ───────────────────────────────────────────────────────────
+function setModePTT() {
+  isAutoMode = false; autoRecording = false;
+  byId('modePTT').className = 'btn-secondary active-mode';
+  byId('modeAuto').className = 'btn-secondary';
+  cleanupPCM();
+  setStatus('✅ PTT — Presiona el botón para hablar', 'connected');
+  addLog('Modo PTT', 'info');
+}
 
-// ─── Auto Mode ─────────────────────────────────────────────────────
-async function startAutoMode() {
+function setModeAuto() {
+  isAutoMode = true;
+  byId('modeAuto').className = 'btn-secondary active-mode';
+  byId('modePTT').className = 'btn-secondary';
+  setStatus('🎤 Modo automático', '');
+  addLog('Modo Auto activado', 'info');
+  startAutoMode();
+}
+
+// ─── Auto Mode (simplificado) ────────────────────────────────────────
+function startAutoMode() {
   if (autoRecording) return;
   autoRecording = true;
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-    const actx = new AudioContext();
-    const source = actx.createMediaStreamSource(stream);
-    const analyser = actx.createAnalyser();
+  
+  navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}})
+  .then(function(stream) {
+    var actx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = actx.createMediaStreamSource(stream);
+    var analyser = actx.createAnalyser();
     analyser.fftSize = 256;
     source.connect(analyser);
-    let isSpeaking = false, silenceStart = 0, autoChunks = [];
-    let autoStream2 = null, autoCtx2 = null, autoSource2 = null, autoProc2 = null, autoSR = 16000, autoRecActive = false;
     
-    function autoCheckVoice() {
-      const data = new Uint8Array(analyser.frequencyBinCount);
+    // 🆕 UN SOLO STREAM para VAD + grabación (sin segundo getUserMedia)
+    var isSpeaking = false, silenceStart = 0;
+    var autoChunks = [], autoRecActive = false;
+    var aSR = actx.sampleRate;
+    var aProc;
+    try { aProc = actx.createScriptProcessor(4096, 1, 1); } catch(e) { aProc = actx.createScriptProcessor(2048, 1, 1); }
+    aProc.onaudioprocess = function(e) {
+      if (!autoRecActive) return;
+      var input = e.inputBuffer.getChannelData(0);
+      var buf = new Int16Array(input.length);
+      for (var j = 0; j < input.length; j++) { var s2 = Math.max(-1, Math.min(1, input[j])); buf[j] = s2 < 0 ? s2 * 32768 : s2 * 32767; }
+      autoChunks.push(buf);
+    };
+    source.connect(aProc);
+    aProc.connect(actx.destination);
+    
+    function checkVoice() {
+      var data = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(data);
-      const avg = data.reduce((a, b) => a + b, 0) / data.length;
+      var sum = 0; for (var i = 0; i < data.length; i++) sum += data[i];
+      var avg = sum / data.length;
       
-      if (avg > 15 && !isSpeaking) {
-        isSpeaking = true; autoChunks = []; autoRecActive = false; silenceStart = 0;
-        navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }).then(s => {
-          autoStream2 = s; autoCtx2 = new AudioContext(); autoSR = autoCtx2.sampleRate;
-          autoSource2 = autoCtx2.createMediaStreamSource(s);
-          autoProc2 = autoCtx2.createScriptProcessor(4096, 1, 1);
-          autoProc2.onaudioprocess = (e) => {
-            if (!autoRecActive) return;
-            const input = e.inputBuffer.getChannelData(0);
-            const int16 = new Int16Array(input.length);
-            for (let i = 0; i < input.length; i++) {
-              const s2 = Math.max(-1, Math.min(1, input[i]));
-              int16[i] = s2 < 0 ? s2 * 32768 : s2 * 32767;
-            }
-            autoChunks.push(int16);
-          };
-          autoSource2.connect(autoProc2); autoProc2.connect(autoCtx2.destination);
-          autoRecActive = true;
-        });
-        statusEl.textContent = '🎤 Grabando...'; statusEl.className = 'status recording';
-        micBtn.className = 'mic-btn active';
+      if (avg > 12 && !isSpeaking) {
+        isSpeaking = true; autoChunks = []; autoRecActive = true; silenceStart = 0;
+        setStatus('🎤 Grabando...', 'recording');
+        byId('micBtn').className = 'mic-btn active';
       } else if (avg < 8 && isSpeaking) {
         if (silenceStart === 0) silenceStart = Date.now();
         else if (Date.now() - silenceStart > 1200) {
           isSpeaking = false; silenceStart = 0; autoRecActive = false;
-          if (autoProc2) try { autoProc2.disconnect(); } catch(e) {}
-          if (autoSource2) try { autoSource2.disconnect(); } catch(e) {}
-          if (autoCtx2) try { autoCtx2.close(); } catch(e) {}
-          if (autoStream2) autoStream2.getTracks().forEach(t => t.stop());
-          autoProc2 = null; autoSource2 = null; autoCtx2 = null; autoStream2 = null;
           if (autoChunks.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
-            const totalSamples = autoChunks.reduce((acc, c) => acc + c.length, 0);
-            const pcmBlob = new Int16Array(totalSamples);
-            let offset = 0;
-            for (const chunk of autoChunks) { pcmBlob.set(chunk, offset); offset += chunk.length; }
-            statusEl.textContent = '🧠 Procesando...'; statusEl.className = 'status processing';
-            const header = new TextEncoder().encode('PCM');
-            const srBytes = new Uint8Array(2);
-            srBytes[0] = autoSR & 0xFF; srBytes[1] = (autoSR >> 8) & 0xFF;
-            const dataView = new Uint8Array(pcmBlob.buffer);
-            const combined = new Uint8Array(header.length + srBytes.length + dataView.length);
-            combined.set(header, 0); combined.set(srBytes, header.length); combined.set(dataView, header.length + srBytes.length);
+            var total = 0; for (var i = 0; i < autoChunks.length; i++) total += autoChunks[i].length;
+            var pcmBlob = new Int16Array(total); var off = 0;
+            for (var i = 0; i < autoChunks.length; i++) { pcmBlob.set(autoChunks[i], off); off += autoChunks[i].length; }
+            setStatus('🧠 Procesando...', 'processing');
+            var header = new TextEncoder().encode('PCM');
+            var srBytes = new Uint8Array(2); srBytes[0] = aSR & 0xFF; srBytes[1] = (aSR >> 8) & 0xFF;
+            var dv = new Uint8Array(pcmBlob.buffer);
+            var combined = new Uint8Array(header.length + srBytes.length + dv.length);
+            combined.set(header, 0); combined.set(srBytes, header.length); combined.set(dv, header.length + srBytes.length);
             ws.send(combined.buffer);
           }
-          autoChunks = []; micBtn.className = 'mic-btn';
+          autoChunks = []; byId('micBtn').className = 'mic-btn';
         }
-      } else if (avg > 8) { silenceStart = 0; }
-      if (autoRecording) requestAnimationFrame(autoCheckVoice);
+      } else if (avg > 8 && isSpeaking) { silenceStart = 0; }
+      if (autoRecording) requestAnimationFrame(checkVoice);
     }
-    autoCheckVoice();
-  } catch (e) {
-    statusEl.textContent = '❌ Error: ' + e.message; statusEl.className = 'status';
+    checkVoice();
+  }).catch(function(err) {
+    setStatus('❌ Error: ' + err.message, '');
     autoRecording = false;
-  }
-}
-
-// ─── Mode Switch ────────────────────────────────────────────────────
-modePTT.addEventListener('click', () => {
-  isAutoMode = false; autoRecording = false;
-  modePTT.className = 'btn-secondary active-mode'; modeAuto.className = 'btn-secondary';
-  cleanupPCM();
-  statusEl.textContent = '✅ PTT — Mantén presionado para hablar'; statusEl.className = 'status connected';
-});
-modeAuto.addEventListener('click', () => {
-  isAutoMode = true;
-  modeAuto.className = 'btn-secondary active-mode'; modePTT.className = 'btn-secondary';
-  statusEl.textContent = '🎤 Modo automático'; statusEl.className = 'status';
-  startAutoMode();
-});
-
-// ─── Logout ─────────────────────────────────────────────────────────
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('rax_auth');
-    if (ws) ws.close();
-    cleanupPCM();
-    isAutoMode = false;
-    autoRecording = false;
-    location.reload();
   });
 }
 
-// ─── Terminal de Logs ────────────────────────────────────────────────
-const logBody = document.getElementById('logBody');
-const logHeader = document.getElementById('logHeader');
-const logToggle = document.getElementById('logToggle');
-let logCollapsed = false;
-
-function addLogLine(text, className = 'dim') {
-  const line = document.createElement('div');
-  line.className = 'log-line ' + className;
-  const now = new Date();
-  const time = now.getHours().toString().padStart(2,'0') + ':' +
-               now.getMinutes().toString().padStart(2,'0') + ':' +
-               now.getSeconds().toString().padStart(2,'0');
-  line.textContent = `[${time}] ${text}`;
-  logBody.appendChild(line);
-  logBody.scrollTop = logBody.scrollHeight;
+function cleanupPCM() {
+  pcmActive = false; autoRecording = false;
+  try { if (pcmProcessor) pcmProcessor.disconnect(); } catch(e) {}
+  try { if (pcmSource) pcmSource.disconnect(); } catch(e) {}
+  try { if (pcmCtx) pcmCtx.close(); } catch(e) {}
+  if (pcmStream) pcmStream.getTracks().forEach(function(t) { t.stop(); });
+  pcmProcessor = null; pcmSource = null; pcmCtx = null; pcmStream = null;
+  pcmChunks = [];
+  try { if (byId('micBtn')) byId('micBtn').className = 'mic-btn'; } catch(e) {}
 }
 
-logHeader.addEventListener('click', () => {
+// ─── Logout ──────────────────────────────────────────────────────────
+function doLogout() {
+  addLog('Cerrando sesión...', 'info');
+  localStorage.removeItem('rax_auth');
+  if (ws) { try { ws.close(); } catch(e) {} ws = null; }
+  cleanupPCM();
+  isAutoMode = false; autoRecording = false;
+  location.reload();
+}
+
+// ─── Terminal Log ────────────────────────────────────────────────────
+function toggleLog() {
   logCollapsed = !logCollapsed;
-  logBody.classList.toggle('collapsed', logCollapsed);
-  logToggle.classList.toggle('collapsed', logCollapsed);
-});
+  byId('logBody').classList.toggle('collapsed', logCollapsed);
+  byId('logToggle').classList.toggle('collapsed', logCollapsed);
+}
+
+function addLog(text, className) {
+  var el = byId('logBody');
+  if (!el) return;
+  var line = document.createElement('div');
+  line.className = 'log-line ' + (className || 'dim');
+  var now = new Date();
+  var time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  line.textContent = '[' + time + '] ' + text;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
 </script>
 </body>
 </html>
